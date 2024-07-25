@@ -245,7 +245,7 @@ namespace TEAMS_csv_To_xlsx
         private List<AttendanceRecord> GetAttendanceRecordsFiles(string subDir)
         {
             var attendanceRecords = new List<AttendanceRecord>();
-
+            txtDetail.Text += "    2. Levantamento de presentes...";
             foreach (string file in Directory.GetFiles(subDir, "*.csv"))
             {
                 AttendanceRecord record = new();
@@ -278,7 +278,7 @@ namespace TEAMS_csv_To_xlsx
                 }
                 attendanceRecords.Add(record);
             }
-            txtDetail.Text += "    2. Levantamento de presentes. \r\n";
+            txtDetail.Text += " Concluído!\r\n";
 
             return attendanceRecords;
         }
@@ -338,6 +338,11 @@ namespace TEAMS_csv_To_xlsx
             }
 
             Console.WriteLine($"Dados gravados com sucesso em: {filePath}");
+        }
+
+        private void MontarPlanilha()
+        {
+
         }
     }
 }
