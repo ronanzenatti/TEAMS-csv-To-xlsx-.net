@@ -156,6 +156,7 @@
             txtDetail.Location = new Point(19, 451);
             txtDetail.Multiline = true;
             txtDetail.Name = "txtDetail";
+            txtDetail.ScrollBars = ScrollBars.Both;
             txtDetail.Size = new Size(479, 191);
             txtDetail.TabIndex = 12;
             // 
