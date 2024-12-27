@@ -10,17 +10,17 @@ namespace TEAMS_csv_To_xlsx
     {
         private int arquivos = 0;
         private int pastas = 0;
-        private Encoding encoding = Encoding.Unicode;
+        private readonly Encoding encoding = Encoding.Unicode;
 
         // Declarar explicitamente o tipo do campo 'data'
-        private Dictionary<string, List<AttendanceRecord>> data = new Dictionary<string, List<AttendanceRecord>>();
+        private Dictionary<string, List<AttendanceRecord>> data = [];
 
         public fmrInicial()
         {
             InitializeComponent();
         }
 
-        private void btnSelecionar_Click(object sender, EventArgs e)
+        private void BtnSelecionar_Click(object sender, EventArgs e)
         {
             if (fbdPathCsv.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
@@ -50,14 +50,17 @@ namespace TEAMS_csv_To_xlsx
                     MessageBox.Show("Selecione uma pasta!!");
                 }
             }
-            catch (Exception ex) { }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro:\n" + ex.Message);
+            }
         }
 
         private void CarregaDadosPasta(string diretorio)
         {
             try
             {
-                DirectoryInfo diretorioInfo = new DirectoryInfo(diretorio);
+                DirectoryInfo diretorioInfo = new(diretorio);
                 //Define o valor máximo do ProgressBar
                 pgBarCsv.Maximum = Directory.GetFiles(diretorio, "*.*", SearchOption.AllDirectories).Length + Directory.GetDirectories(diretorio, "**", SearchOption.AllDirectories).Length;
                 TreeNode tds = tvDados.Nodes.Add(diretorioInfo.Name);
@@ -72,7 +75,7 @@ namespace TEAMS_csv_To_xlsx
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Sem permissões para a pasta!");
+                MessageBox.Show("Sem permissões para a pasta!\n" + ex.Message);
             }
         }
 
@@ -82,7 +85,7 @@ namespace TEAMS_csv_To_xlsx
             // Percorre os arquivos
             foreach (string arq in arquivos)
             {
-                FileInfo arquivo = new FileInfo(arq);
+                FileInfo arquivo = new(arq);
                 TreeNode tds = tnd.Nodes.Add(arquivo.Name);
                 tds.Tag = arquivo.FullName;
                 tds.StateImageIndex = 0;
@@ -100,7 +103,7 @@ namespace TEAMS_csv_To_xlsx
             // Percorre os subdiretorios a ver se existem outras subpasts
             foreach (string subdiretorio in subdiretorioEntradas)
             {
-                DirectoryInfo diretorio = new DirectoryInfo(subdiretorio);
+                DirectoryInfo diretorio = new(subdiretorio);
                 TreeNode tds = td.Nodes.Add(diretorio.Name);
                 tds.StateImageIndex = 1;
                 tds.ImageIndex = 1;
@@ -153,7 +156,7 @@ namespace TEAMS_csv_To_xlsx
             }
         }
 
-        private void btnPathExport_Click(object sender, EventArgs e)
+        private void BtnPathExport_Click(object sender, EventArgs e)
         {
             if (fbdPathXlsx.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
@@ -161,7 +164,7 @@ namespace TEAMS_csv_To_xlsx
             }
         }
 
-        private void btnConvert_Click(object sender, EventArgs e)
+        private void BtnConvert_Click(object sender, EventArgs e)
         {
             btnConvert.Enabled = false;
 
@@ -175,7 +178,7 @@ namespace TEAMS_csv_To_xlsx
                 string turmaKey = new DirectoryInfo(subDir).Name;
                 if (!data.ContainsKey(turmaKey))
                 {
-                    data[turmaKey] = new List<AttendanceRecord>();
+                    data[turmaKey] = [];
                 }
 
                 // Adiciona o nome da turma no status
@@ -185,7 +188,7 @@ namespace TEAMS_csv_To_xlsx
                 List<Person> students = GetStudents(subDir);
 
                 // Verifica a presença de cada aluno nos arquivos
-                data[turmaKey] = GetAttendanceRecordsFiles(subDir);
+                data[turmaKey] = GetAttendanceRecordsFiles(subDir, students);
 
                 btnConvert.Enabled = true;
 
@@ -229,8 +232,7 @@ namespace TEAMS_csv_To_xlsx
                                     rm,
                                     values[0],
                                     email,
-                                    (values[6] == "Organizer" || values[6] == "Organizador") ? "EQUIPE" : "ALUNO"
-                                    );
+                                    (values[6] == "Organizer" || values[6] == "Organizador") ? "EQUIPE" : "ALUNO");
                                 persons.Add(person);
                             }
                         }
@@ -242,15 +244,16 @@ namespace TEAMS_csv_To_xlsx
             return persons;
         }
 
-        private List<AttendanceRecord> GetAttendanceRecordsFiles(string subDir)
+        private List<AttendanceRecord> GetAttendanceRecordsFiles(string subDir, List<Person> students)
         {
             var attendanceRecords = new List<AttendanceRecord>();
             txtDetail.Text += "    2. Levantamento de presentes...";
             foreach (string file in Directory.GetFiles(subDir, "*.csv"))
             {
-                AttendanceRecord record = new();
-
-                record.File = Path.GetFileName(file);
+                AttendanceRecord record = new()
+                {
+                    File = Path.GetFileName(file)
+                };
 
                 using (var reader = new StreamReader(file, encoding))
                 {
@@ -275,6 +278,7 @@ namespace TEAMS_csv_To_xlsx
                         i++;
                     }
                     record.Presentes = new List<string>(emails);
+                    record.Pessoas = students;
                 }
                 attendanceRecords.Add(record);
             }
@@ -289,7 +293,7 @@ namespace TEAMS_csv_To_xlsx
             string pattern = @"^[a-zA-Z0-9._%+-]+@(fatcursos\.org\.br|pmc\.fatcursos\.org\.br)$";
 
             // Cria uma instância da classe Regex com o padrão especificado
-            Regex regex = new Regex(pattern, RegexOptions.IgnoreCase);
+            Regex regex = new(pattern, RegexOptions.IgnoreCase);
 
             // Verifica se o e-mail corresponde ao padrão
             return regex.IsMatch(email);
@@ -314,7 +318,7 @@ namespace TEAMS_csv_To_xlsx
         {
             // Usa uma expressão regular para encontrar números antes do '@'
             string pattern = @"(\d+)(?=@)";
-            Regex regex = new Regex(pattern);
+            Regex regex = new(pattern);
             Match match = regex.Match(email);
 
             // Se houver um número, retorna ele como inteiro. Caso contrário, retorna 0.
@@ -323,17 +327,18 @@ namespace TEAMS_csv_To_xlsx
 
         private static void PrintAttendanceData(Dictionary<string, List<AttendanceRecord>> data, string filePath)
         {
-            using (StreamWriter writer = new StreamWriter(filePath, false, Encoding.UTF8))
+            using (StreamWriter writer = new(filePath, false, Encoding.UTF8))
             {
                 foreach (var turma in data)
                 {
                     writer.WriteLine($"Turma: {turma.Key}");
                     foreach (var record in turma.Value)
                     {
-                        writer.WriteLine($"  Data: {record.Data}");
-                        writer.WriteLine($"  Presentes: {string.Join(", ", record.Presentes)}");
+                        writer.WriteLine($"\n Data: {record.Data}");
+                        writer.WriteLine($"ALUNOS: \n{string.Join("\n", record.Pessoas)}");
+                        writer.WriteLine($"Presentes: \n{string.Join("\n", record.Presentes)}");
                     }
-                    writer.WriteLine();
+                    writer.WriteLine("\n");
                 }
             }
 

@@ -68,7 +68,7 @@
             btnSelecionar.TabIndex = 0;
             btnSelecionar.Text = "Selecionar Pasta";
             btnSelecionar.UseVisualStyleBackColor = false;
-            btnSelecionar.Click += btnSelecionar_Click;
+            btnSelecionar.Click += BtnSelecionar_Click;
             // 
             // fbdPathCsv
             // 
@@ -181,7 +181,7 @@
             btnConvert.TabIndex = 10;
             btnConvert.Text = "CONVERTER";
             btnConvert.UseVisualStyleBackColor = false;
-            btnConvert.Click += btnConvert_Click;
+            btnConvert.Click += BtnConvert_Click;
             // 
             // label5
             // 
@@ -203,7 +203,7 @@
             btnPathExport.Size = new Size(44, 44);
             btnPathExport.TabIndex = 8;
             btnPathExport.UseVisualStyleBackColor = true;
-            btnPathExport.Click += btnPathExport_Click;
+            btnPathExport.Click += BtnPathExport_Click;
             // 
             // label4
             // 

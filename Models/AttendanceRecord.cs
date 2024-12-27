@@ -10,6 +10,7 @@ namespace TEAMS_csv_To_xlsx.Models
     {
         public string Data { get; set; }
         public string File { get; set; }
+        public List<Person> Pessoas { get; set; }
         public List<string> Presentes { get; set; }
     }
 }

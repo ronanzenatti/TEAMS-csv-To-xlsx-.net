@@ -20,9 +20,13 @@ namespace TEAMS_csv_To_xlsx.Models
             Nome = nome;
             Email = email;
             Tipo = tipo;
-            Presencas = new List<string>();
+            Presencas = [];
+        }
+
+        public override string ToString()
+        {
+            return $"NOME: {this.Nome}, RM: {this.RM}, EMAIL: {this.Email}, TIPO: {this.Tipo}";
         }
     }
-
-
+ 
 }
